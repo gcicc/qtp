@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git push:*)",
+      "Bash(mkdir:*)",
+      "Bash(python:*)",
+      "Bash(del test_structures.py test_structures_direct.py test_final.py)",
+      "Bash(rm:*)"
+    ],
+    "deny": []
+  }
+}

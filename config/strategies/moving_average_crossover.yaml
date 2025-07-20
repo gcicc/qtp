@@ -1,0 +1,142 @@
+# Moving Average Crossover Strategy Configuration
+
+strategy:
+  name: "Moving Average Crossover"
+  description: "Classic moving average crossover strategy with configurable windows"
+  version: "1.0.0"
+  type: "trend_following"
+  
+# Strategy Parameters
+parameters:
+  # Moving Average Settings
+  fast_window: 20              # Fast moving average period
+  slow_window: 50              # Slow moving average period
+  ma_type: "sma"               # sma (simple) or ema (exponential)
+  
+  # Signal Generation
+  min_cross_threshold: 0.001   # Minimum percentage difference for valid crossover
+  confirmation_periods: 1      # Number of periods to confirm crossover
+  
+  # Position Sizing
+  base_position_size: 0.05     # Base position size (5% of portfolio)
+  max_position_size: 0.15      # Maximum position size (15% of portfolio)
+  confidence_scaling: true     # Scale position size by signal confidence
+  
+# Risk Management
+risk_controls:
+  stop_loss:
+    enabled: true
+    type: "percentage"         # percentage, atr_multiple, moving_average
+    value: 3.0                 # 3% stop loss
+    
+  take_profit:
+    enabled: true
+    type: "percentage"
+    value: 9.0                 # 9% take profit (3:1 risk-reward)
+    
+  position_limits:
+    max_holding_period: 30     # Maximum days to hold position
+    max_consecutive_losses: 3   # Exit after 3 consecutive losses
+    
+# Entry Conditions
+entry_conditions:
+  volume_filter:
+    enabled: true
+    min_volume_ratio: 1.5      # Minimum volume vs average volume
+    
+  trend_filter:
+    enabled: true
+    trend_lookback: 100        # Periods to determine overall trend
+    only_with_trend: true      # Only trade in direction of overall trend
+    
+  volatility_filter:
+    enabled: false
+    max_volatility: 0.05       # Maximum daily volatility for entry
+    
+# Exit Conditions  
+exit_conditions:
+  reverse_crossover:
+    enabled: true              # Exit on reverse crossover
+    
+  profit_target:
+    enabled: true
+    trailing_stop: false       # Use trailing stop for profits
+    
+  time_based:
+    enabled: false
+    max_holding_days: 10       # Maximum holding period
+
+# Market Conditions
+market_filters:
+  market_regime:
+    enabled: false
+    allowed_regimes: ["trending", "consolidating"]
+    
+  volatility_regime:
+    enabled: false
+    max_vix_level: 30         # Don't trade when VIX > 30
+    
+# Backtesting Specific Settings
+backtesting:
+  warm_up_period: 100         # Periods needed before generating signals
+  transaction_costs:
+    commission: 0.0           # Commission per trade
+    slippage: 0.001           # 0.1% slippage
+    
+# Performance Targets
+performance_targets:
+  annual_return: 0.12         # Target 12% annual return
+  max_drawdown: 0.08          # Maximum 8% drawdown
+  sharpe_ratio: 1.5           # Target Sharpe ratio
+  win_rate: 0.55              # Target 55% win rate
+
+# Optimization Parameters
+optimization:
+  parameters_to_optimize:
+    - fast_window: [10, 15, 20, 25, 30]
+    - slow_window: [40, 50, 60, 70, 80]
+    - stop_loss: [0.02, 0.03, 0.04, 0.05]
+    
+  objective_function: "sharpe_ratio"  # sharpe_ratio, return, calmar_ratio
+  optimization_period: 252           # Days for in-sample optimization
+  validation_period: 126             # Days for out-of-sample validation
+
+# Alert Configuration
+alerts:
+  signal_generation:
+    enabled: true
+    channels: ["log", "email"]   # log, email, webhook, discord
+    
+  risk_breach:
+    enabled: true
+    channels: ["log", "email"]
+    
+  performance_milestone:
+    enabled: false
+    thresholds: [0.05, 0.10, 0.15]  # Alert at 5%, 10%, 15% gains/losses
+
+# Explanation Templates
+explanations:
+  signal_template: |
+    A {signal_type} signal was generated for {symbol} at ${price:.2f} due to a {ma_type} 
+    moving average crossover. The {fast_window}-period moving average crossed {direction} 
+    the {slow_window}-period moving average, indicating a potential {trend_direction} trend.
+    
+    Technical Analysis:
+    - Fast MA ({fast_window}): ${fast_ma:.2f}
+    - Slow MA ({slow_window}): ${slow_ma:.2f}
+    - Separation: {separation:.2%}
+    - Confidence: {confidence:.1%}
+    
+    Risk Management:
+    - Position Size: {position_size:.2%} of portfolio
+    - Stop Loss: ${stop_loss:.2f} ({stop_loss_pct:.1%})
+    - Take Profit: ${take_profit:.2f} ({take_profit_pct:.1%})
+    
+  risk_template: |
+    Risk Assessment for {symbol}:
+    - Current Position: {current_position:.2%}
+    - Risk per Share: {risk_per_share:.2%}  
+    - Portfolio Risk: {portfolio_risk:.2%}
+    - Expected Return: {expected_return:.2%}
+    - Risk-Reward Ratio: {risk_reward_ratio:.1f}:1

@@ -1,0 +1,230 @@
+# Default Configuration for Quantitative Trading Platform (QTP)
+# This file contains the default settings for all QTP components
+
+# Application Information
+app:
+  name: "Quantitative Trading Platform"
+  version: "0.1.0" 
+  environment: "development"  # development, staging, production
+  debug: true
+  log_level: "INFO"
+
+# Database Configuration
+database:
+  type: "sqlite"  # sqlite, postgresql, mysql
+  path: "data/qtp.db"  # for sqlite
+  host: "localhost"
+  port: 5432
+  name: "qtp_db"
+  user: "qtp_user"
+  password: "qtp_password"
+  pool_size: 10
+
+# Data Sources Configuration
+data_sources:
+  primary: "yahoo_finance"  # yahoo_finance, alpha_vantage, iex_cloud
+  backup: "alpha_vantage"
+  
+  yahoo_finance:
+    enabled: true
+    rate_limit: 2000  # requests per hour
+    timeout: 30
+    
+  alpha_vantage:
+    enabled: false
+    api_key: "${ALPHA_VANTAGE_API_KEY}"
+    rate_limit: 500
+    timeout: 30
+    
+  iex_cloud:
+    enabled: false
+    api_key: "${IEX_CLOUD_API_KEY}"
+    rate_limit: 1000000
+    timeout: 30
+
+# Data Pipeline Configuration
+data_pipeline:
+  validation:
+    enabled: true
+    max_missing_percentage: 5.0
+    outlier_detection: true
+    quality_checks: true
+    
+  features:
+    technical_indicators: true
+    fundamental_metrics: true
+    custom_features: true
+    
+  storage:
+    format: "parquet"  # parquet, csv, hdf5
+    compression: "snappy"
+    cache_size_mb: 1024
+
+# Strategy Configuration
+strategies:
+  default_position_size: 0.05  # 5% of portfolio
+  max_position_size: 0.20      # 20% maximum
+  max_positions: 10            # Maximum number of concurrent positions
+  rebalance_frequency: "daily" # daily, weekly, monthly
+  
+  risk_controls:
+    stop_loss_percentage: 5.0   # 5% stop loss
+    take_profit_percentage: 15.0 # 15% take profit
+    max_drawdown: 10.0          # 10% maximum drawdown
+    
+  built_in:
+    moving_average_crossover:
+      enabled: true
+      fast_window: 20
+      slow_window: 50
+      
+    mean_reversion:
+      enabled: false
+      lookback_window: 20
+      z_score_threshold: 2.0
+
+# Risk Management Configuration
+risk_management:
+  position_sizing:
+    method: "kelly_criterion"  # kelly_criterion, fixed_fractional, risk_parity
+    kelly_fraction: 0.25       # Use 25% of full Kelly
+    max_position_fraction: 0.20
+    
+  portfolio_limits:
+    max_leverage: 1.0          # No leverage by default
+    max_sector_exposure: 0.30  # 30% maximum in any sector
+    max_single_position: 0.20  # 20% maximum in any single stock
+    
+  monitoring:
+    var_confidence: 0.95       # 95% confidence VaR
+    var_window: 252            # 1 year rolling window
+    stress_test_scenarios: 5
+    alert_thresholds:
+      portfolio_loss: 5.0      # Alert at 5% portfolio loss
+      position_loss: 10.0      # Alert at 10% single position loss
+
+# AI Agents Configuration
+agents:
+  enabled: true
+  max_concurrent_agents: 6
+  heartbeat_interval: 30       # seconds
+  
+  market_research:
+    enabled: true
+    update_frequency: 3600     # seconds (1 hour)
+    data_sources: ["news", "economic_data", "sentiment"]
+    
+  strategy_development:
+    enabled: true
+    optimization_frequency: 86400  # seconds (daily)
+    genetic_algorithm:
+      population_size: 50
+      generations: 100
+      mutation_rate: 0.1
+      
+  risk_monitor:
+    enabled: true
+    monitoring_frequency: 300  # seconds (5 minutes)
+    alert_levels: ["info", "warning", "critical"]
+    
+  education:
+    enabled: true
+    content_update_frequency: 43200  # seconds (12 hours)
+    difficulty_levels: ["beginner", "intermediate", "advanced"]
+    
+  execution:
+    enabled: false  # Disabled in development
+    execution_algorithms: ["market", "limit", "twap", "vwap"]
+    
+  explanation:
+    enabled: true
+    explanation_levels: ["novice", "intermediate", "expert"]
+    include_charts: true
+
+# Backtesting Configuration
+backtesting:
+  default_start_date: "2020-01-01"
+  default_end_date: "2023-12-31"
+  initial_capital: 100000      # $100,000
+  benchmark: "^GSPC"           # S&P 500
+  
+  transaction_costs:
+    commission_per_trade: 0.0   # $0 commission (modern brokers)
+    spread_percentage: 0.05     # 0.05% bid-ask spread
+    market_impact: 0.1          # 0.1% market impact
+    
+  analysis:
+    rolling_window: 252         # 1 year
+    monte_carlo_runs: 1000
+    confidence_intervals: [0.05, 0.95]
+
+# Execution Configuration
+execution:
+  paper_trading: true          # Enable paper trading by default
+  live_trading: false          # Disable live trading by default
+  
+  brokers:
+    interactive_brokers:
+      enabled: false
+      account_id: "${IB_ACCOUNT_ID}"
+      gateway_port: 7497
+      
+    alpaca:
+      enabled: false
+      api_key: "${ALPACA_API_KEY}"
+      secret_key: "${ALPACA_SECRET_KEY}"
+      base_url: "https://paper-api.alpaca.markets"
+      
+  order_management:
+    default_order_type: "market"
+    timeout_seconds: 300
+    retry_attempts: 3
+    
+# Performance and Monitoring
+performance:
+  metrics_calculation_frequency: 3600  # seconds (1 hour)
+  benchmark_comparison: true
+  attribution_analysis: true
+  
+  alerts:
+    email_enabled: false
+    webhook_enabled: false
+    discord_enabled: false
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file_path: "logs/qtp.log"
+  max_file_size: "100MB"
+  backup_count: 5
+  
+  modules:
+    data: "INFO"
+    strategies: "INFO" 
+    risk: "INFO"
+    backtesting: "INFO"
+    execution: "WARNING"
+    agents: "INFO"
+    explanations: "INFO"
+
+# Security Configuration
+security:
+  encryption_enabled: true
+  api_key_encryption: true
+  session_timeout: 3600        # seconds (1 hour)
+  max_login_attempts: 5
+  
+# Development Settings
+development:
+  auto_reload: true
+  debug_mode: true
+  profiling_enabled: false
+  mock_data_enabled: true
+  
+# Production Settings (override in production.yaml)
+production:
+  debug: false
+  log_level: "WARNING"
+  auto_reload: false
+  profiling_enabled: true
